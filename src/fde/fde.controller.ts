@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, UseInterceptors} from '@nestjs/common';
+import {Controller, Get, Post, Body, UseInterceptors, Param} from '@nestjs/common';
 import { CreateFDEwdto } from './dto/FDE.dto';
 import { LoggingInterceptor } from './dto/log.interceptor';
 import { FdeService } from './fde.service';
@@ -11,6 +11,11 @@ export class FdeController {
     @Get()
     async findAll(){
       return this.fdeService.getAllFde()
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id){
+      return this.fdeService.getTask(id)
     }
 
     @Post('create')

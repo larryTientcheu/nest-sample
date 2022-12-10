@@ -12,10 +12,10 @@ export class CreateFDEwdto{
 
 }
 
-// const schema = Joi.object().keys({
-//      first_date_of_execution: Joi.date
-// })
+const schema = Joi.object({
+     first_date_of_execution: Joi.date(),
+     repeat: Joi.number(),
+     task_id: Joi.string().regex(/^[0-9]*_/),
+ })
 
-// // const result = Joi.validate(CreateFDEwdto,schema);
-
-// schema.validate(CreateFDEwdto)
+ schema.validate(CreateFDEwdto)

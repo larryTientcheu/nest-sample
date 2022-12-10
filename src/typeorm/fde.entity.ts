@@ -9,7 +9,7 @@ export class FDE {
     id: number;
 
     @Column({
-        type: 'timestamptz',
+        type: 'timestamp',
         nullable: true,
     })
     first_date_of_execution: Date;

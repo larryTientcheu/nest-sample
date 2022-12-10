@@ -4,12 +4,14 @@ import { FdeService } from './fde.service';
 import { FDE } from 'src/typeorm';
 
 import {TypeOrmModule} from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronService } from './fde.cron.service';
 
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([FDE])],
+    imports: [TypeOrmModule.forFeature([FDE]), ScheduleModule.forRoot()],
     controllers: [FdeController],
-    providers:[FdeService],
+    providers:[FdeService,CronService],
 })
 export class FdeModule{}

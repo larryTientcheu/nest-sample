@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FDE } from 'src/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFDEwdto } from './dto/FDE.dto';
+import {v4 as uuidv4} from 'uuid';
+import { CronService } from './fde.cron.service';
+import { LoggingInterceptor } from './dto/log.interceptor';
+
+
 
 
 @Injectable()
@@ -12,13 +17,29 @@ export class FdeService {
     @InjectRepository(FDE)
     private readonly fdeRepository: Repository<FDE>
   ){}
+  private readonly cronService: CronService
 
   getAllFde(){
     return this.fdeRepository.find()
   }
 
+  getTask(id: number){
+    return this.fdeRepository.findOne({
+      select:[],
+      where:{
+        id,
+      },
+    });
+
+  }
+
   createFde(createFdeDto: CreateFDEwdto){
     const newFde = this.fdeRepository.create(createFdeDto);
+    newFde.task_id = uuidv4();
+    LoggingInterceptor.globalVarTask_id = newFde.task_id;
+    CronService.globalVar = newFde
+    CronService.globalVarDate = newFde.first_date_of_execution;
+    CronService.globalVarrepeat = newFde.repeat;
     return this.fdeRepository.save(newFde)
   }
 
