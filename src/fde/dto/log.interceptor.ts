@@ -2,9 +2,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler, BadGatewayE
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import {v4 as uuidv4} from 'uuid';
 
-let myuuid = uuidv4();
 
 
 @Injectable()
