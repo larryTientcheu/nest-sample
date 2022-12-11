@@ -11,13 +11,16 @@ export class CronService {
   static globalVar: any;
   static globalVarDate: Date;
   static globalVarrepeat: any;
-  // static globalVarTask_id: any;
-
-  @Cron(new Date(CronService.globalVarDate))
+  // @Cron(new Date(Date.now() + 10 * 1000))
+  @Cron(new Date(CronService.globalVarDate),
+  {
+    name: 'notifications',
+    timeZone: 'Europe/Paris',
+  })
   handleCron() {
     var x = 0;
     while(x < CronService.globalVarrepeat){
-      console.log(new Date(CronService.globalVar));
+      console.log(CronService.globalVar);
       x++;
     }
     
