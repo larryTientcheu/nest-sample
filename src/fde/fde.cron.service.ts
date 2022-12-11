@@ -9,7 +9,7 @@ export class CronService {
   private readonly logger = new Logger(CronService.name);
   // constructor(private readonly fdeService: FdeService){};
   static globalVar: any;
-  static globalVarDate: any;
+  static globalVarDate: Date;
   static globalVarrepeat: any;
   // static globalVarTask_id: any;
 
