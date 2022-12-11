@@ -1,24 +1,22 @@
-FROM node:18-alpine as builder
-ENV NODE_ENV=production
+FROM node:18-alpine as development
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY package*.json /usr/src/app/
-COPY tsconfig*.json ./usr/src/app/
+COPY package*.json ./
+RUN npm install --only=development
 RUN npm install -g @nestjs/cli
-RUN npm install
-RUN npm install @nestjs/typeorm typeorm
-RUN npm install pg
-
-
-FROM builder as build1
-# RUN npm install -g typescript
-
-
-# FROM build1 as build2
-# RUN npm run build
 COPY . .
 RUN npm run build
-EXPOSE 5000
 
-# CMD ["npm", "run", "start:dev"]
+FROM development as production
+ENV NODE_ENV=production
+
+WORKDIR /usr/src/app
+RUN npm install --only=production
+COPY . .
+
+COPY --from=development /usr/src/app/dist ./dist
+
+EXPOSE 5000
 CMD [ "node", "dist/main.js" ]
+
+

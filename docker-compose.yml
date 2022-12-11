@@ -3,6 +3,8 @@ version: '3.4'
 services:
   nest:
     image: nest
+    depends_on:
+     - db
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -14,8 +16,6 @@ services:
       - 5000:5000
   db:
     image: postgres:14.1-alpine
-    depends_on:
-     - db
     restart: always
     environment:
       - POSTGRES_USER=postgres
