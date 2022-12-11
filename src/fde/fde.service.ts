@@ -1,12 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FDE } from 'src/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFDEwdto } from './dto/FDE.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { CronService } from './fde.cron.service';
+
 import { LoggingInterceptor } from './dto/log.interceptor';
 import Joi from 'joi';
+import { MoreThanOrEqual } from "typeorm"
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 
 
@@ -16,25 +19,48 @@ export class FdeService {
 
   constructor(
     @InjectRepository(FDE)
-    private readonly fdeRepository: Repository<FDE>
+    private readonly fdeRepository: Repository<FDE>,private schedulerRegistry: SchedulerRegistry
   ) { }
-  private readonly cronService: CronService
+  private readonly logger = new Logger(FdeService.name);
 
   getAllFde() {
     return this.fdeRepository.find()
   }
 
-  getTask(id: number) {
-    return this.fdeRepository.findOne({
-      select: [],
+  // getTask(id: number) {
+  //   return this.fdeRepository.findOne({
+  //     select: [],
+  //     where: {
+  //       id,
+  //     },
+  //   });
+  // }
+
+  async getAllFdeAfterToday() {
+    return this.fdeRepository.find({
       where: {
-        id,
+        first_date_of_execution: MoreThanOrEqual(new Date(Date.now()))
       },
     });
-
   }
 
-  createFde(createFdeDto: CreateFDEwdto) {
+  addCronJob(name: string, seconds: string, repeat:number) {
+    const job = new CronJob(new Date(seconds), () => {
+      var x = 0;
+      while ( x < repeat){
+      this.logger.warn(`time (${seconds}) for job ${name} to run!`);
+    x++}
+    });
+  
+    this.schedulerRegistry.addCronJob(name, job);
+    job.start();
+  
+    this.logger.warn(
+      `job ${name} added for each minute at ${seconds} seconds!`,
+    );
+  }
+
+  async createFde(createFdeDto: CreateFDEwdto) {
     const newFde = this.fdeRepository.create(createFdeDto);
     newFde.task_id = uuidv4();
 
@@ -48,11 +74,10 @@ export class FdeService {
     schema.validate(newFde)
 
     LoggingInterceptor.globalVarTask_id = newFde.task_id;
-    CronService.globalVar = newFde
-    CronService.globalVarDate = newFde.first_date_of_execution;
-    console.log(new Date(CronService.globalVarDate))
-    CronService.globalVarrepeat = newFde.repeat;
-    return this.fdeRepository.save(newFde)
-  }
+    const fde = this.fdeRepository.save(newFde)
+    this.addCronJob('' + newFde.task_id, '' + newFde.first_date_of_execution, newFde.repeat)
 
+    return fde
+
+  }
 }

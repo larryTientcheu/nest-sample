@@ -16,9 +16,14 @@ export class FdeController {
 
 
   // Get a specific task
-  @Get(':id')
-  async findOne(@Param('id') id) {
-    return this.fdeService.getTask(id)
+  // @Get(':id')
+  // async findOne(@Param('id') id) {
+  //   return this.fdeService.getTask(id)
+  // }
+
+  @Get('tasks')
+  async findTasks(){
+    return this.fdeService.getAllFdeAfterToday()
   }
 
   // Create a new Task
@@ -26,6 +31,4 @@ export class FdeController {
   async createFdes(@Body() createFdeDto: CreateFDEwdto) {
     return this.fdeService.createFde(createFdeDto);
   }
-
-
 }
